@@ -1,4 +1,7 @@
 (ns giro.test.db.core
+  (:use clojure.core
+        midje.sweet
+        giro.util)
   (:require [giro.db.core :refer [*db*] :as db]
             [luminus-migrations.core :as migrations]
             [clojure.test :refer :all]
@@ -15,22 +18,28 @@
     (migrations/migrate ["migrate"] (select-keys env [:database-url]))
     (f)))
 
-(deftest test-users
-  (jdbc/with-db-transaction [t-conn *db*]
+(def test-giro {:name            "Test App"
+                :url_apple       "apple"
+                :url_googleplay  "google"
+                :url_amazon      "amazon"
+                :url_windows     "windows"
+                :url_fallback    "fallback"
+                :keen_write_key  "write"
+                :keen_project_id "project"
+                :keen_event      "event"
+                :ga_tracking_id  "ga"
+                })
+
+(deftest test-giros
+  (jdbc/with-db-transaction
+    [t-conn *db*]
     (jdbc/db-set-rollback-only! t-conn)
-    (is (= 1 (db/create-user!
-               t-conn
-               {:id         "1"
-                :first_name "Sam"
-                :last_name  "Smith"
-                :email      "sam.smith@example.com"
-                :pass       "pass"})))
-    (is (= {:id         "1"
-            :first_name "Sam"
-            :last_name  "Smith"
-            :email      "sam.smith@example.com"
-            :pass       "pass"
-            :admin      nil
-            :last_login nil
-            :is_active  nil}
-           (db/get-user t-conn {:id "1"})))))
+    (let [admin_id (first (db/create-giro! t-conn test-giro))
+          actual-giro (db/get-giro-by-admin-id t-conn admin_id)]
+
+      (is (not-empty (:id actual-giro)))
+      (is (= (merge test-giro admin_id)
+             (select-keys-inv actual-giro [:id :created])))
+      )
+    )
+  )

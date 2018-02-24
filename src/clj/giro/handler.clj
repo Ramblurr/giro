@@ -2,6 +2,7 @@
   (:require [compojure.core :refer [routes wrap-routes]]
             [giro.layout :refer [error-page]]
             [giro.routes.home :refer [home-routes]]
+            [giro.routes.link :refer [link-routes]]
             [compojure.route :as route]
             [giro.env :refer [defaults]]
             [mount.core :as mount]
@@ -13,7 +14,8 @@
 
 (def app-routes
   (routes
-    (-> #'home-routes
+    (->
+        #'link-routes
         (wrap-routes middleware/wrap-csrf)
         (wrap-routes middleware/wrap-formats))
     (route/not-found

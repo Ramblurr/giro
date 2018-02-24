@@ -1,0 +1,208 @@
+{% extends "base.html" %}{% block content %}
+
+{{toast}}{% if giro %}
+<section class="hero is-info">
+    <div class="container">
+        <div class="columns is-vcentered">
+            <div class="column is-4">
+                <p>Your giro is</p>
+                <h2 class="is-size-4 link">{{ giro-url }}/{{ giro.id }}</h2>
+                <p>Share it far and wide.</p>
+            </div>
+            <div class="column is-3">
+                <a href="/{{giro.id}}/png" title="Download PNG">
+                    <img class="qrcode" src="{{giro.qrcode}}"/>
+                </a>
+            </div>
+            <div class="column is-5">
+                <a href="/{{giro.id}}/png" title="Download PNG" class="button">Download QR Code</a>
+                <h3 class="">Embed your giro directly </h3>
+                <pre><code>&lt;img src="{{ giro-url }}/{{giro.id}}/png" style="image-rendering: pixelated; width: 270px; height: 270px;"/&gt;</code></pre>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<section class="hero is-danger">
+    <div class="container hero-body">
+
+        <div class="columns is-vcentered">
+            <div class="column is-4">
+                <strong>Keep this link secret!</strong>
+                <h2 class="subtitle link">{{ giro-url }}/admin/{{ giro.admin_id }}</h2>
+            </div>
+
+            <div class="column is-8">
+                This is your giro admin link. Come back here any time to edit your giro.
+            </div>
+        </div>
+    </div>
+    <!--</div>-->
+</section>{% endif %}
+<div class="container">
+    <form method="POST" action="/{% if giro|not-empty %}admin/{{giro.admin_id}} {% endif %}">
+        <section class="section link-edit">
+            <div class="columns ">
+                <div class="column is-one-quarter">
+                    <h3 class="title is-3">Name</h3>
+                    What is the name of your application?
+                </div>
+                <div class="column">
+                    <div class="control">
+                        <input name="name" class="input {%if errors.name %}is-danger{%endif%}"
+                               type="text" placeholder="Application name" value="{{giro.name}}">
+                    </div>
+                    {% if errors.name %}
+                    <p class="help is-danger">{{errors.name|join}}</p>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="columns ">
+                <div class="column is-one-quarter">
+                    <h3 class="title is-3">Fallback Link</h3>
+                    Send the visitor to this URL if from an unspecified or unknown device.
+                </div>
+                <div class="column">
+                    <div class="field has-addons">
+                        <div class="control">
+                            <a class="button is-static"><span class="icon is-small is-right"><i
+                                    class="fa fa-globe"></i></span></a>
+                        </div>
+                        <div class="control is-expanded">
+                            <input name="url_fallback"
+                                   class="input {%if errors.name %}is-danger{%endif%}" type="text"
+                                   placeholder="Fallback Link" value="{{giro.url_fallback}}">
+                        </div>
+
+                    </div>
+                    {% if errors.url_fallback%}
+                    <p class="help is-danger">{{errors.url_fallback|join}}</p>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="columns ">
+                <div class="column is-one-quarter">
+                    <h3 class="title is-3">Device Links</h3>
+                    Provide per-device URLs that visitors will be redirected to.
+                </div>
+                <div class="column">
+                    <div class="field has-addons">
+                        <p class="control">
+                            <a class="button is-static"><span class="icon is-small is-right"><i
+                                    class="fa fa-apple"></i></span></a>
+                        </p>
+                        <p class="control is-expanded">
+                            <input name="url_apple" class="input" type="text" placeholder="iOS Link"
+                                   value="{{giro.url_apple}}">
+                        </p>
+                    </div>
+                    <div class="field has-addons">
+                        <p class="control">
+                            <a class="button is-static"><span class="icon is-small is-right"><i
+                                    class="fa fa-google"></i></span></a>
+                        </p>
+                        <p class="control is-expanded">
+                            <input name="url_googleplay" class="input" type="text"
+                                   placeholder="Google Play Link" value="{{giro.url_googleplay}}">
+                        </p>
+                    </div>
+                    <div class="field has-addons">
+                        <p class="control">
+                            <a class="button is-static"><span class="icon is-small is-right"><i
+                                    class="fa fa-amazon"></i></span></a>
+                        </p>
+                        <p class="control is-expanded">
+                            <input name="url_amazon" class="input" type="text"
+                                   placeholder="Amazon Appstore Link" value="{{giro.url_amazon}}">
+                        </p>
+                    </div>
+                    <div class="field has-addons">
+                        <p class="control">
+                            <a class="button is-static"><span class="icon is-small is-right"><i
+                                    class="fa fa-windows"></i></span></a>
+                        </p>
+                        <p class="control is-expanded">
+                            <input name="url_windows" class="input" type="text"
+                                   placeholder="Microsoft Store Link" value="{{giro.url_winodws}}">
+                        </p>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="columns ">
+                <div class="column is-one-quarter">
+                    <h3 class="title is-3">Analytics</h3>
+                    Optional integrations with analytics services to report visit statistics.
+                </div>
+                <div class="column">
+                    <div class="field is-horizontal">
+                        <div class="field-label is-normal">
+                            <label class="label">Google Analytics</label>
+                        </div>
+                        <div class="field-body">
+                            <div class="field">
+                                <p class="control ">
+                                    <input name="ga_tracking_id" class="input" type="text"
+                                           placeholder="GA Tracking ID"
+                                           value="{{giro.ga_tracking_id}}">
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="field is-horizontal">
+                        <div class="field-label is-normal">
+                            <label class="label">Keen.io</label>
+                        </div>
+                        <div class="field-body">
+                            <div class="field">
+                                <p class="control">
+                                    <input name="keen_write_key" class="input" type="text"
+                                           placeholder="Keen Write Key"
+                                           value="{{giro.keen_write_key}}">
+                                </p>
+                            </div>
+                            <div class="field">
+                                <p class="control">
+                                    <input name="keen_project_id" class="input" type="text"
+                                           placeholder="Keen Project ID"
+                                           value="{{giro.keen_project_id}}">
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="field is-horizontal">
+                        <div class="field-label is-normal"></div>
+                        <div class="field-body">
+                            <div class="field">
+                                <p class="control">
+                                    <input name="keen_event" class="input" type="text"
+                                           placeholder="Keen Event" value="{{giro.keen_event}}">
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="columns ">
+                <div class="column is-one-quarter"></div>
+                <div class="column">
+
+                    {% if errors.message %}
+                    <div class="alert alert-danger">{{errors.message|join}}</div>
+                    {% endif %}
+
+                    <div class="field is-grouped is-grouped-right">
+                        <div class="control">
+                            <input type="hidden" name="admin_id" value="{{giro.admin_id}}"/>
+                            <input type="hidden" name="id" value="{{giro.id}}"/>
+                            <button class="button is-info">Save</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        {% csrf-field %}
+    </form>
+</div>{% endblock %}

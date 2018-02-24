@@ -1,0 +1,2 @@
+DROP TABLE IF EXISTS giro;
+DROP TRIGGER IF EXISTS trigger_genid;

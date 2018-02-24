@@ -1,13 +1,13 @@
 (ns giro.test.handler
-  (:require [clojure.test :refer :all]
-            [ring.mock.request :refer :all]
+  (:use midje.sweet)
+  (:require [ring.mock.request :refer :all]
             [giro.handler :refer :all]))
 
-(deftest test-app
-  (testing "main route"
-    (let [response ((app) (request :get "/"))]
-      (is (= 200 (:status response)))))
+(facts "Testing giro"
+       (fact "Getting the root page should return a non-error"
+             (let [response ((app) (request :get "/"))]
+               (:status response) => 200))
 
-  (testing "not-found route"
-    (let [response ((app) (request :get "/invalid"))]
-      (is (= 404 (:status response))))))
+       (fact "Getting a giro that doesn't exist should return a 404"
+             (let [response ((app) (request :get "/does-not-exist"))]
+               (:status response) => 404)))
